@@ -6,18 +6,21 @@ A step-by-step guide to building an intelligent resume chatbot using **Amazon Le
 
 ## 📌 Table of Contents
 
-1. [Introduction](#1-introduction)
-2. [Project Objective](#2-project-objective)
-3. [What is Amazon Lex?](#3-what-is-amazon-lex)
-4. [Prerequisites](#4-prerequisites)
-5. [Creating the Lex Bot](#5-creating-the-lex-bot)
-6. [Defining Intents](#6-defining-intents)
-   - [WelcomeIntent](#61-welcomeintent)
-   - [FallbackIntent](#62-fallbackintent)
-7. [Creating Custom Slot Types](#7-creating-custom-slot-types)
-8. [Connecting AWS Lambda](#8-connecting-aws-lambda)
-9. [Testing the Chatbot](#9-testing-the-chatbot)
-10. [Technologies Used](#10-technologies-used)
+1. [Introduction](#1-introduction)  
+2. [Project Objective](#2-project-objective)  
+3. [What is Amazon Lex?](#3-what-is-amazon-lex)  
+4. [Prerequisites](#4-prerequisites)  
+5. [Creating the Lex Bot](#5-creating-the-lex-bot)  
+6. [Defining Intents](#6-defining-intents)  
+   - [What is an Intent?](#what-is-an-intent)  
+   - [WelcomeIntent](#61-welcomeintent)  
+   - [FallbackIntent](#62-fallbackintent)  
+7. [Creating Custom Slot Types](#7-creating-custom-slot-types)  
+   - [What are Slots?](#what-are-slots)  
+8. [Connecting AWS Lambda](#8-connecting-aws-lambda)  
+   - [What is AWS Lambda?](#what-is-aws-lambda)  
+9. [Testing the Chatbot](#9-testing-the-chatbot)  
+10. [Technologies Used](#10-technologies-used)  
 11. [Future Enhancements](#11-future-enhancements)
 
 ---
@@ -40,161 +43,172 @@ To develop a chatbot that:
 
 ## 3. 💡 What is Amazon Lex?
 
-Amazon Lex is a fully managed AI service for building conversational interfaces using voice and text. It powers **Alexa** and allows developers to:
+**Amazon Lex** is a fully managed AI service by AWS for building conversational interfaces into any application using voice and text. It powers **Amazon Alexa** and uses automatic speech recognition (ASR) and natural language understanding (NLU).
 
-- Understand and classify intents
-- Build multi-turn conversations
-- Use slots for data capture
-- Integrate with Lambda for dynamic responses
-- Deploy securely and scalably with AWS infrastructure
+### ✅ Key Features:
+- Understands user intent and context
+- Integrates with AWS Lambda for dynamic responses
+- Pay-as-you-go pricing
+- Scales to handle high traffic
 
 ---
 
 ## 4. 🔧 Prerequisites
 
-- AWS account
+- An [AWS account](https://aws.amazon.com)
 - IAM user with permissions to access:
   - Amazon Lex
   - AWS Lambda
-- Basic knowledge of Python (for Lambda functions)
-- Resume content (structured or plain text)
+- Basic Python knowledge (for Lambda)
+- Resume content to use in responses
 
 ---
 
 ## 5. 🛠️ Creating the Lex Bot
 
-1. Log into the [AWS Management Console](https://aws.amazon.com/console).
-2. Navigate to **Amazon Lex V2**.
-3. Click **"Create bot"**.
-4. Select **"Create a blank bot"** under the **Traditional** tab.
+1. Log into the [AWS Management Console](https://aws.amazon.com/console)
+2. Go to **Amazon Lex V2**
+3. Click **"Create bot"**
+4. Choose **"Create a blank bot"** (under the *Traditional* tab)
 5. Bot Name: `ResumeBot`
 6. Description:  
-   *Resume bot to help HRs and recruiters interact with me 24/7 and understand my career path, skills, and project experience.*
-7. IAM Permissions: Choose **Create a role with basic Amazon Lex permissions**.
-8. COPPA: Select **No**.
-9. Session Timeout: **5 minutes**
-10. Language: **English**
-11. Voice: Optional (e.g., Danielle for voice-enabled bots)
-12. Confidence Threshold: Keep default (0.40)
-13. Click **Create**.
+   *Helps recruiters understand my career and projects through a chatbot interface*
+7. IAM Permissions: Select **"Create a role with basic Lex permissions"**
+8. COPPA: Select **"No"**
+9. Session Timeout: `5 minutes`
+10. Language: English
+11. Voice: Optional (e.g., Danielle)
 
 ---
 
 ## 6. 🧠 Defining Intents
 
+### 🔍 What is an Intent?
+
+An **Intent** represents the purpose or goal of a user’s input. For example, when a user says “Hi” or “I have a job offer,” they are trying to start a conversation. Each intent maps to a specific action or response.
+
 ### 6.1 WelcomeIntent
 
 - **Intent Name**: `WelcomeIntent`
-- **Description**: Greets the user.
+- **Description**: Responds to user greetings or job-related phrases
 - **Sample Utterances**:
   - Hi
   - Hello
   - Can we talk?
   - Are you a data engineer?
-  - I have a job offer
-  - I have an opportunity for you
-- **Closing Response**:
-```
+- **Response**:
 
-Hello, I am Subhranil Sengupta Bot. I am an AI clone of Subhranil Sengupta. I can share my skills, projects, and experience with you!
-
-```
+  ```
+  Hello, I am Subhranil Sengupta Bot. I am an AI clone of Subhranil Sengupta. I can share my skills, projects, and experience with you!
+  ```
 
 ### 6.2 FallbackIntent
 
-- **Triggered when**: No other intent is matched.
+- **Purpose**: Catch-all intent when no other intent matches
+- **When triggered**: Bot fails to understand the user’s input
 - **Response**:
-```
 
-Sorry, I didn't understand that. I can:
+  ```
+  Sorry, I didn't understand that. I can:
 
-1. Share details about Subhranil Sengupta’s career.
-2. Provide skills, experiences, and project information.
-   Can you please rephrase?
-
-````
+  1. Share details about Subhranil Sengupta’s career.
+  2. Provide skills, experiences, and project information.
+  
+  Can you please rephrase?
+  ````
 
 ---
 
 ## 7. 📥 Creating Custom Slot Types
 
-Slots are variables used by intents to gather necessary data.
+### 🔍 What are Slots?
 
-### Steps to Add Custom Slots:
+**Slots** are variables in a conversation used to capture specific pieces of information from the user — like names, dates, or job roles.
 
-1. Go to **Slot types** on the left panel.
-2. Click **"Add slot type"** > **"Add blank slot type"**.
+Amazon Lex provides built-in slot types (e.g., date, number), but you can also create custom ones.
+
+### Steps to Create a Custom Slot Type:
+
+1. In Lex, go to **Slot Types**
+2. Click **“Add slot type”**
 3. Name: `HrQuestions`
-4. Enable **Restrict to slot values**.
-5. Add slot values such as:
+4. Enable: **Restrict to slot values**
+5. Add custom values:
  - Checking
- - JobRole
  - Interview
-6. Save Slot Type.
+ - JobRole
+6. Save
 
-You can now use this slot in relevant intents to ask follow-up questions like:
-> "What role are you hiring for?"
+You can now use this slot to ask, for example:  
+> “What role are you hiring for?”
 
 ---
 
 ## 8. 🔗 Connecting AWS Lambda
 
-Amazon Lex can delegate fulfillment logic to Lambda functions.
+### 🔍 What is AWS Lambda?
 
-### Step-by-Step:
+**AWS Lambda** is a serverless compute service that runs backend code in response to events (like user input). It lets you run logic without provisioning or managing servers.
 
-1. Go to AWS Lambda → Create Function
-2. Runtime: Python 3.9 (or 3.8)
-3. Function Name: `ResumeBotLambda`
+### Steps to Integrate Lambda:
 
-### Sample Python Lambda Code:
-```python
-def lambda_handler(event, context):
-  intent_name = event['sessionState']['intent']['name']
-  
-  if intent_name == 'UnderstandUser':
-      return {
-          "sessionState": {
-              "dialogAction": {
-                  "type": "Close"
-              },
-              "intent": {
-                  "name": "UnderstandUser",
-                  "state": "Fulfilled"
-              }
-          },
-          "messages": [{
-              "contentType": "PlainText",
-              "content": "I have worked as a Data Engineer at Amazon. Some of my key projects include setting up data pipelines using Glue and Athena..."
-          }]
-      }
-````
+1. Go to **AWS Lambda → Create Function**
+2. Runtime: `Python 3.8+`
+3. Function name: `ResumeBotLambda`
 
-4. Deploy the function.
-5. In Lex → Intent settings → **Lambda Initialization and Fulfillment**, attach the Lambda function.
+### Sample Lambda Code:
+
+  ```python
+  def lambda_handler(event, context):
+    intent_name = event['sessionState']['intent']['name']
+    
+    if intent_name == 'UnderstandUser':
+        return {
+            "sessionState": {
+                "dialogAction": {
+                    "type": "Close"
+                },
+                "intent": {
+                    "name": "UnderstandUser",
+                    "state": "Fulfilled"
+                }
+            },
+            "messages": [{
+                "contentType": "PlainText",
+                "content": "I have worked as a Data Engineer at Amazon. Some of my key projects include setting up data pipelines using Glue and Athena..."
+            }]
+        }
+  ````
+
+4. Save and deploy
+5. In Amazon Lex, go to the relevant intent → **Lambda Initialization and Fulfillment**
+6. Attach your Lambda function
 
 ---
 
 ## 9. 🧪 Testing the Chatbot
 
-### How to Test:
+1. In Amazon Lex Console, click **“Test Bot”**
+2. Try greeting messages like:
 
-1. In the Lex Console, go to **Test Bot**.
-2. Type any of the utterances defined in `WelcomeIntent`, e.g., “Hi”
-3. Try unknown phrases to trigger `FallbackIntent`
-4. Ask about skills or job roles to test Lambda integration.
+   * “Hi”
+   * “Can we talk?”
+3. Try unknown phrases to test `FallbackIntent`
+4. Try Lambda-based queries like:
+
+   * “What projects have you worked on?”
 
 ---
 
 ## 10. 🧰 Technologies Used
 
-| Tool           | Purpose                             |
-| -------------- | ----------------------------------- |
-| Amazon Lex     | Chatbot framework                   |
-| AWS Lambda     | Backend logic & dynamic fulfillment |
-| IAM            | Secure permissions                  |
-| Python         | Lambda scripting                    |
-| Amazon Console | Development & testing UI            |
+| Tool        | Description                             |
+| ----------- | --------------------------------------- |
+| Amazon Lex  | NLP engine for building chatbots        |
+| AWS Lambda  | Serverless logic for custom responses   |
+| IAM         | Access control and permissions          |
+| Python      | Language used in Lambda                 |
+| AWS Console | UI for building, testing, and deploying |
 
 ---
 
@@ -202,15 +216,23 @@ def lambda_handler(event, context):
 
 * Add more intents for:
 
-  * Certifications
   * Education
-  * Personal projects
-* Connect chatbot to a database or S3 bucket to fetch resume dynamically
-* Deploy on a website or Slack using API Gateway
-* Enable voice interaction for IVR or Alexa
+  * Certifications
+  * Soft skills
+* Fetch content dynamically from a resume file or database
+* Deploy on platforms like Slack, websites, or mobile apps
+* Add voice interaction or IVR flow for call-based interactions
 
 ---
 
 ## 🙌 Conclusion
 
-This chatbot allows recruiters to interact with a resume conversationally, making candidate evaluation more intuitive and interactive. With Amazon Lex and AWS Lambda, you can scale this idea into a full-fledged HR assistant.
+You've now created a fully functional, AI-powered chatbot using Amazon Lex that can:
+
+* Respond to user inputs
+* Handle errors gracefully
+* Offer dynamic, customized responses via Lambda
+
+With further tuning, this can evolve into a full-featured virtual assistant for job seekers and recruiters alike.
+
+---
